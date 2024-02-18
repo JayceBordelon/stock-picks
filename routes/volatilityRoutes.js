@@ -4,6 +4,7 @@ const cheerio = require('cheerio');
 const axios = require('axios');
 
 const fetchStocks = async () => {
+  console.info("Parsing current stock data...");
   try {
     const response = await axios.get("https://finance.yahoo.com/most-active/");
     const html = response.data;
@@ -20,7 +21,7 @@ const fetchStocks = async () => {
       
       stockList.push({ symbol, name, price, change, percentChange, marketCap, bearOrBull: Number(percentChange.replace('%', '')) > 0 ? "Bullish" : "Bearish" });
     });
-
+    console.log("Data parsing complete", stockList);
     return stockList;
   } catch (error) {
     console.error('Failed to fetch or parse stock data:', error);
