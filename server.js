@@ -8,10 +8,10 @@ const port = 3000;
 app.use(cors());
 
 // Import route modules
-const volatilityRoutes = require('./routes/volatilityRoutes');
+const stockScraping = require('./routes/scrapingRoutes');
 
 // Use routes
-app.use('/volatility', volatilityRoutes);
+app.use('/scrape', stockScraping);
 
 // Catch-all route for 404 Not Found
 app.use((req, res) => {
