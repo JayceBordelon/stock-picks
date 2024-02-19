@@ -3,14 +3,16 @@ const router = express.Router();
 const cheerio = require('cheerio');
 const axios = require('axios');
 
-// http://localhost:3000/scrape
-const fetchStocks = async () => {
+const scrapeTVdata = async (endpoints) => {
   console.info("Parsing current stock data...");
   try {
-    const gainResponse = await axios.get("https://www.tradingview.com/markets/stocks-usa/market-movers-gainers/");
-    const lossResponse = await axios.get("https://www.tradingview.com/markets/stocks-usa/market-movers-losers/");
-    const html = gainResponse.data + lossResponse.data;
-    const $ = cheerio.load(html);
+    let rawHtml = "";
+    for (const endpoint of endpoints) {
+      const response = await axios.get(endpoint);
+      rawHtml += response.data; // Correctly accumulate HTML data
+    }
+    
+    const $ = cheerio.load(rawHtml);
     const stockList = []; // Initialize as an array
 
     $('.listRow').each((index, element) => {
@@ -43,14 +45,33 @@ const fetchStocks = async () => {
 
 
 
-router.get('/', async (req, res) => {
+router.get('/volatile', async (req, res) => {
     try {
-        const stocks = await fetchStocks();
+        const stocks = await scrapeTVdata(
+          [
+            "https://www.tradingview.com/markets/stocks-usa/market-movers-gainers/",
+           "https://www.tradingview.com/markets/stocks-usa/market-movers-losers/"
+          ]
+          );
         res.json(stocks);
       } catch (err) {
         console.error(err);
         res.status(500).send("Failed to fetch active stocks");
       }
+})
+
+router.get('/popular', async (req, res) => {
+  try {
+    const stocks = await scrapeTVdata(["https://www.tradingview.com/markets/stocks-usa/market-movers-active/"]);
+    res.json(stocks);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Failed to fetch active stocks");
+  }
+})
+
+router.get('/saved', async (req, res) => {
+  return;
 })
 
 module.exports = router;
