@@ -32,7 +32,7 @@ const scrapeTVdata = async (endpoints) => {
 
       stockList.push({ symbol, name, price, percentChange, href, logo });
     });
-    console.log("Data parsing complete", stockList);
+    console.log("Data parsing complete");
     return stockList;
   } catch (error) {
     console.error('Failed to fetch or parse stock data:', error);
